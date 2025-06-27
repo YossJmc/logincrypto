@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CryptoTools</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-xl">
+    <h1 class="text-2xl font-bold mb-4 text-center">🔒 Herramientas Criptográficas</h1>
+    <textarea id="textInput" rows="4" class="w-full p-2 border rounded mb-4" placeholder="Escribe algo para cifrar"></textarea>
+    <button onclick="encryptText()" class="bg-blue-600 text-white px-4 py-2 rounded w-full mb-2">🔐 Cifrar</button>
+    <button onclick="decryptText()" class="bg-green-600 text-white px-4 py-2 rounded w-full mb-4">🔓 Descifrar</button>
+    <textarea id="outputText" rows="4" class="w-full p-2 border rounded" placeholder="Resultado..."></textarea>
+  </div>
+
+  <!-- CryptoJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script>
+    function encryptText() {
+      const text = document.getElementById("textInput").value;
+      const encrypted = CryptoJS.AES.encrypt(text, "clave-secreta").toString();
+      document.getElementById("outputText").value = encrypted;
+    }
+
+    function decryptText() {
+      const encrypted = document.getElementById("outputText").value;
+      try {
+        const decrypted = CryptoJS.AES.decrypt(encrypted, "clave-secreta").toString(CryptoJS.enc.Utf8);
+        document.getElementById("outputText").value = decrypted;
+      } catch (e) {
+        alert("⚠️ Texto o clave inválida");
+      }
+    }
+  </script>
+</body>
+</html>
