@@ -1,0 +1,279 @@
+  <!-- index.html (actualizado para SPA) -->
+  <!DOCTYPE html>
+  <html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CryptoTools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white shadow-xl rounded-xl w-full max-w-6xl flex overflow-hidden">
+      
+      <!-- Sidebar -->
+      <aside class="bg-purple-700 text-white w-64 p-6 flex-shrink-0">
+<h2 id="bienvenidaUsuario" class="text-xl font-bold mb-6">👋 Bienvenido</h2>
+        <nav class="space-y-4">
+          <div>
+            <h3 class="text-sm uppercase tracking-wide font-semibold text-purple-200 mb-2">Datos Cripto</h3>
+            <button onclick="loadContent('clasica')" class="block text-left w-full hover:underline">• Criptografía Clásica</button>
+            <button onclick="loadContent('moderna')" class="block text-left w-full hover:underline">• Criptografía Moderna</button>
+            <button onclick="loadContent('tendencias')" class="block text-left w-full hover:underline">• Tendencias Criptográficas</button>
+          </div>
+          <div>
+            <h3 class="text-sm uppercase tracking-wide font-semibold text-purple-200 mt-6 mb-2">Recursos</h3>
+            <button onclick="loadContent('sobremi')" class="block text-left w-full hover:underline">• Sobre mí</button>
+            <button onclick="loadContent('herramientas')" class="block text-left w-full hover:underline">• Herramientas</button>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main -->
+      <main class="flex-1 p-8 bg-gray-50 overflow-y-auto" id="mainContent">
+        <!-- Este contenido cambiará dinámicamente -->
+      </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+      function encryptText() {
+        const text = document.getElementById("textInput").value;
+        const encrypted = CryptoJS.AES.encrypt(text, "clave-secreta").toString();
+        document.getElementById("outputText").value = encrypted;
+      }
+
+      function decryptText() {
+        const encrypted = document.getElementById("outputText").value;
+        try {
+          const decrypted = CryptoJS.AES.decrypt(encrypted, "clave-secreta").toString(CryptoJS.enc.Utf8);
+          document.getElementById("outputText").value = decrypted;
+        } catch {
+          alert("⚠️ Error al descifrar el texto.");
+        }
+      }
+
+  async function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    const mainContent = document.getElementById("mainContent");
+    const outputArea = document.getElementById("outputText");
+
+    let title = "";
+    let content = "";
+
+    // Si hay campo de resultado (sección herramientas), usa eso
+    if (outputArea) {
+      title = "Resultado Criptográfico";
+      content = outputArea.value || "Sin contenido";
+    } else {
+      // Si es una sección normal (clásica, moderna, etc.)
+      const heading = mainContent.querySelector("h1, h2");
+  title = heading?.textContent?.replace(/^[^\w\d]+/, "").trim() || "CryptoTools";
+
+      // Recorrer el contenido y construir texto limpio
+      content = "";
+      mainContent.querySelectorAll("p, li").forEach(el => {
+        const text = el.textContent.trim();
+        if (el.tagName === "LI") {
+          content += `• ${text}\n`;
+        } else {
+          content += `${text}\n\n`;
+        }
+      });
+    }
+
+    // Limpiar caracteres raros y saltos múltiples
+    content = content
+      .replace(/[^\x20-\x7EÁÉÍÓÚáéíóúñÑüÜ¿¡\n\r•]/g, "")
+      .replace(/\n{3,}/g, "\n\n");
+
+    // Configuración
+    const leftMargin = 20;
+    const rightMargin = 190;
+    const lineHeight = 7;
+    let y = 30;
+
+    // Título centrado
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(title, 105, 20, { align: "center" });
+
+    // Cuerpo del contenido justificado
+    doc.setFont("times", "normal");
+    doc.setFontSize(12);
+    const lines = doc.splitTextToSize(content, rightMargin - leftMargin);
+    lines.forEach(line => {
+      if (y >= 280) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(line, leftMargin, y);
+      y += lineHeight;
+    });
+
+    // Pie de página con autor y fecha
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Generado por Yoseph - CryptoTools", leftMargin, 290);
+    doc.text(new Date().toLocaleDateString(), 170, 290);
+
+    // Guardar con nombre claro
+    const filename = title.toLowerCase().replace(/[^\w\s]/gi, "").replace(/\s+/g, "_") + ".pdf";
+    doc.save(filename);
+  }
+
+
+
+      function loadContent(section) {
+        const main = document.getElementById("mainContent");
+        switch (section) {
+          case 'clasica':
+            main.innerHTML = `
+              <h1 class="text-3xl font-bold mb-4">📜 Criptografía Clásica</h1>
+  <p class="mb-4">
+    La criptografía clásica es el estudio y uso de técnicas de cifrado desarrolladas antes de la era digital. Estas técnicas se usaban para proteger información militar, diplomática o personal. Aunque ya no son seguras contra los métodos modernos, representan la base de todo el campo de la criptografía actual.
+  </p>
+
+  <h2 class="text-xl font-semibold mb-2">🔑 Ejemplos Clásicos:</h2>
+  <ul class="list-disc list-inside mb-4 space-y-1">
+    <li><strong>Cifrado César:</strong> Desplaza cada letra del mensaje un número fijo de posiciones. Por ejemplo, con un desplazamiento de 3, la A se convierte en D.</li>
+    <li><strong>Cifrado Atbash:</strong> Invierte el alfabeto. La A se convierte en Z, la B en Y, etc.</li>
+    <li><strong>Cifrado por Sustitución Monoalfabética:</strong> Cada letra se reemplaza por otra usando un alfabeto reorganizado.</li>
+    <li><strong>Cifrado Vigenère:</strong> Usa una palabra clave para aplicar múltiples cifrados César, haciendo que el cifrado sea más resistente a ataques.</li>
+  </ul>
+
+  <p class="mb-4">
+    Aunque son fáciles de implementar, la mayoría de estos sistemas pueden ser rotos fácilmente mediante análisis de frecuencias, un método que examina qué letras aparecen con mayor frecuencia en el texto cifrado.
+  </p>
+
+  <div class="text-center">
+    <button onclick="generatePDF()" class="bg-gray-800 text-white px-6 py-2 rounded">📄 Guardar como PDF</button>
+  </div>
+
+            `;
+            break;
+          case 'moderna':
+            main.innerHTML = `
+              <h1 class="text-2xl font-bold mb-4">🔐 Criptografía Moderna</h1>
+              <p class="mb-4">La criptografía moderna se basa en principios matemáticos como la teoría de números, y utiliza algoritmos como AES y RSA para proteger datos en la era digital.</p>
+              <div class="text-center mt-6">
+    <button onclick="generatePDF()" class="bg-gray-800 text-white px-6 py-2 rounded">📄 Generar PDF</button>
+  </div>
+
+            `;
+            break;
+          case 'tendencias':
+            main.innerHTML = `
+              <h1 class="text-2xl font-bold mb-4">📈 Tendencias Criptográficas</h1>
+              <p class="mb-4">Las tendencias actuales incluyen criptografía cuántica, homomórfica y el uso de blockchain para asegurar datos sin necesidad de terceros de confianza.</p>
+              <div class="text-center mt-6">
+    <button onclick="generatePDF()" class="bg-gray-800 text-white px-6 py-2 rounded">📄 Generar PDF</button>
+  </div>
+
+            `;
+            break;
+          case 'sobremi':
+            main.innerHTML = `
+              <h1 class="text-2xl font-bold mb-4">👤 Sobre mí</h1>
+              <p class="mb-4">Soy Yoseph, un entusiasta de la tecnología, escritor de ideas y explorador digital. Me apasiona la criptografía y la seguridad informática.</p>
+              <ul class="mb-4 list-disc list-inside">
+                <li>🎓 Universidad Z - Ingeniería en Computación</li>
+                <li>🎨 Aficionado a escribir y al ajedrez</li>
+                <li>🔍 Curioso de nuevas tecnologías</li>
+              </ul>
+              <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+    <button onclick="alert('Aquí irá la descarga del CV');" class="bg-gray-800 hover:bg-blue-800 text-white px-6 py-2 rounded">Descargar CV</button>
+    <button onclick="alert('Aquí irá la descarga de la llave pública');" class="bg-gray-800 hover:bg-green-800 text-white px-6 py-2 rounded">Descargar Llave Pública</button>
+  </div>
+
+            `;
+            break;
+          case 'herramientas':
+          default:
+            main.innerHTML = `
+              <h1 class="text-3xl font-bold text-center mb-6">🔒 Herramientas Criptográficas</h1>
+              <div class="space-y-4">
+                <textarea id="textInput" rows="4" class="w-full p-3 border border-gray-300 rounded" placeholder="Escribe algo para cifrar..."></textarea>
+                <div class="flex gap-2 justify-center">
+                  <button onclick="encryptText()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">🔐 Cifrar</button>
+                  <button onclick="decryptText()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">🔓 Descifrar</button>
+                </div>
+                <textarea id="outputText" rows="4" class="w-full p-3 border border-gray-300 rounded" placeholder="Resultado..."></textarea>
+              </div>
+            `;
+        }
+      }
+
+      // Cargar sección predeterminada
+      loadContent('clasica');
+    </script>
+
+
+
+
+
+
+
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc
+  } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+  // Tu configuración de Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyAK1EFhR-hCukQtaIp51atV2lzBeNx-ITo",
+    authDomain: "cryptoyos-a0e66.firebaseapp.com",
+    projectId: "cryptoyos-a0e66",
+    storageBucket: "cryptoyos-a0e66.appspot.com",
+    messagingSenderId: "910899320304",
+    appId: "1:910899320304:web:4fb01fa68829be9d9eb935"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const ref = doc(db, "usuarios", user.uid);
+      const docSnap = await getDoc(ref);
+
+      const name = docSnap.exists() ? docSnap.data().nombre : user.email;
+      const titulo = document.getElementById("bienvenidaUsuario");
+      if (titulo) titulo.textContent = `👋 Bienvenido: ${name}`;
+    } else {
+      // Si no hay usuario, redirige al login
+      window.location.href = "index.html";
+    }
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </body>
+  </html>
