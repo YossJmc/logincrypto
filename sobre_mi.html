@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>¿Quién soy yo?</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #4b6cb7;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    section {
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      margin-top: 1rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .gallery, .hobbies {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .gallery img, .hobbies img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    button {
+      background-color: #4b6cb7;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: gray;
+      font-size: 0.9rem;
+    }
+    .contact-icons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      font-size: 1.5rem;
+      margin-top: 1rem;
+    }
+    .contact-icons a {
+      color: #4b6cb7;
+      text-decoration: none;
+    }
+  </style>
+  <!-- Iconos de redes (Font Awesome) -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header>
+  <h1>¡Hola, soy Yoseph!</h1>
+  <p>"Una frase que te represente"</p>
+</header>
+
+<section>
+  <h2>Sobre mí</h2>
+  <p>Me gusta escribir, crear y aprender. Esta página es sobre mí 😄.</p>
+</section>
+
+<section>
+  <h2>Formación Académica 🎓</h2>
+  <ul>
+    <li><strong>Secundaria:</strong> Escuela Secundaria General No. X</li>
+    <li><strong>Preparatoria:</strong> Preparatoria Y</li>
+    <li><strong>Universidad:</strong> Universidad Z - Ingeniería en Computación</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Pasatiempos 🎨</h2>
+  <div class="hobbies">
+    <div>
+      <p><strong>Escribir historias</strong></p>
+      <img src="hobby1.jpg" alt="Escribir">
+    </div>
+    <div>
+      <p><strong>Jugar ajedrez</strong></p>
+      <img src="hobby2.jpg" alt="Ajedrez">
+    </div>
+    <div>
+      <p><strong>Explorar nuevas tecnologías</strong></p>
+      <img src="hobby3.jpg" alt="Tecnología">
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>3 Datos curiosos sobre la criptografía 🔐</h2>
+  <ul>
+    <li>🔑 La criptografía moderna usa matemáticas complejas como la teoría de números.</li>
+    <li>💬 El cifrado César fue uno de los primeros métodos criptográficos usados por Julio César.</li>
+    <li>🧠 La criptografía cuántica podría cambiar todo el panorama de la seguridad digital.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Galería de Fotos 📸</h2>
+  <div class="gallery">
+    <img src="foto1.jpg" alt="Foto 1">
+    <img src="foto2.jpg" alt="Foto 2">
+    <img src="foto3.jpg" alt="Foto 3">
+  </div>
+</section>
+
+<section>
+  <h2>Video favorito 🎬</h2>
+  <iframe width="100%" height="315" src="https://www.youtube.com/embed/TU_VIDEO_ID" frameborder="0" allowfullscreen></iframe>
+</section>
+
+<section>
+  <h2>Contacto 📬</h2>
+  <p>¡Hablemos!</p>
+  <div class="contact-icons">
+    <a href="mailto:tunombre@email.com"><i class="fas fa-envelope"></i></a>
+    <a href="https://instagram.com/tuusuario" target="_blank"><i class="fab fa-instagram"></i></a>
+    <a href="https://twitter.com/tuusuario" target="_blank"><i class="fab fa-twitter"></i></a>
+    <a href="https://github.com/tuusuario" target="_blank"><i class="fab fa-github"></i></a>
+  </div>
+</section>
+
+<section style="text-align: center;">
+  <h2>Recursos para descargar 📂</h2>
+  <p>Puedes descargar mis archivos importantes desde aquí:</p>
+  <a href="mi_llave_publica.asc" download><button>Descargar Llave Pública</button></a>
+  <a href="mi_cv.pdf" download><button>Descargar CV</button></a>
+</section>
+
+<footer>
+  <!--<p>Hecho con 💙 por Yoseph</p> -->
+</footer>
+
+</body>
+</html>
