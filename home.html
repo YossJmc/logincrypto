@@ -1,0 +1,856 @@
+  <!-- index.html (actualizado para SPA) -->
+  <!DOCTYPE html>
+  <html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CryptoTools</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white shadow-xl rounded-xl w-full max-w-6xl flex overflow-hidden">
+      
+      <!-- Sidebar -->
+      <aside class="bg-purple-700 text-white w-64 p-6 flex-shrink-0">
+<h2 id="bienvenidaUsuario" class="text-xl font-bold mb-6">Bienvenido</h2>
+        <nav class="space-y-4">
+          <div>
+            <h3 class="text-sm uppercase tracking-wide font-semibold text-purple-200 mb-2">Datos Cripto</h3>
+            <button onclick="loadContent('clasica')" class="block text-left w-full hover:underline">• Criptografía Clásica</button>
+            <button onclick="loadContent('moderna')" class="block text-left w-full hover:underline">• Criptografía Moderna</button>
+            <button onclick="loadContent('tendencias')" class="block text-left w-full hover:underline">• Tendencias Criptográficas</button>
+          </div>
+          <div>
+            <h3 class="text-sm uppercase tracking-wide font-semibold text-purple-200 mt-6 mb-2">Recursos</h3>
+            <button onclick="loadContent('sobremi')" class="block text-left w-full hover:underline">• Sobre mí</button>
+            <button onclick="loadContent('rsa')" class="block text-left w-full hover:underline">• RSA</button>
+            <button onclick="loadContent('rsa_hibrido')" class="block text-left w-full hover:underline">• RSA Hibrido</button>
+
+
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main -->
+      <main class="flex-1 p-8 bg-gray-50 overflow-y-auto" id="mainContent">
+        <!-- Este contenido cambiará dinámicamente -->
+      </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+      function encryptText() {
+        const text = document.getElementById("textInput").value;
+        const encrypted = CryptoJS.AES.encrypt(text, "clave-secreta").toString();
+        document.getElementById("outputText").value = encrypted;
+      }
+
+      function decryptText() {
+        const encrypted = document.getElementById("outputText").value;
+        try {
+          const decrypted = CryptoJS.AES.decrypt(encrypted, "clave-secreta").toString(CryptoJS.enc.Utf8);
+          document.getElementById("outputText").value = decrypted;
+        } catch {
+          alert("⚠️ Error al descifrar el texto.");
+        }
+      }
+
+  async function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    const mainContent = document.getElementById("mainContent");
+    const outputArea = document.getElementById("outputText");
+
+    let title = "";
+    let content = "";
+
+    // Si hay campo de resultado (sección herramientas), usa eso
+    if (outputArea) {
+      title = "Resultado Criptográfico";
+      content = outputArea.value || "Sin contenido";
+    } else {
+      // Si es una sección normal (clásica, moderna, etc.)
+      const heading = mainContent.querySelector("h1, h2");
+  title = heading?.textContent?.replace(/^[^\w\d]+/, "").trim() || "CryptoTools";
+
+      // Recorrer el contenido y construir texto limpio
+      content = "";
+      mainContent.querySelectorAll("p, li").forEach(el => {
+        const text = el.textContent.trim();
+        if (el.tagName === "LI") {
+          content += `• ${text}\n`;
+        } else {
+          content += `${text}\n\n`;
+        }
+      });
+    }
+
+    // Limpiar caracteres raros y saltos múltiples
+    content = content
+      .replace(/[^\x20-\x7EÁÉÍÓÚáéíóúñÑüÜ¿¡\n\r•]/g, "")
+      .replace(/\n{3,}/g, "\n\n");
+
+    // Configuración
+    const leftMargin = 20;
+    const rightMargin = 190;
+    const lineHeight = 7;
+    let y = 30;
+
+    // Título centrado
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(title, 105, 20, { align: "center" });
+
+    // Cuerpo del contenido justificado
+    doc.setFont("times", "normal");
+    doc.setFontSize(12);
+    const lines = doc.splitTextToSize(content, rightMargin - leftMargin);
+    lines.forEach(line => {
+      if (y >= 280) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(line, leftMargin, y);
+      y += lineHeight;
+    });
+
+    // Pie de página con autor y fecha
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Generado por Yoseph - CryptoTools", leftMargin, 290);
+    doc.text(new Date().toLocaleDateString(), 170, 290);
+
+    // Guardar con nombre claro
+    const filename = title.toLowerCase().replace(/[^\w\s]/gi, "").replace(/\s+/g, "_") + ".pdf";
+    doc.save(filename);
+  }
+
+
+
+      function loadContent(section) {
+        const main = document.getElementById("mainContent");
+        switch (section) {
+case 'clasica':
+  main.innerHTML = `
+    <h1 class="text-3xl font-bold mb-4">Criptografía Clásica</h1>
+    <p class="mb-4">
+      La criptografía clásica es el arte del cifrado antes de la era computacional. Estas técnicas, aunque obsoletas en términos de seguridad actual, sentaron las bases del cifrado moderno.
+    </p>
+
+    <h2 class="text-xl font-semibold mb-2">Características Principales:</h2>
+    <ul class="list-disc list-inside mb-4 space-y-1">
+      <li>Uso de lápiz y papel o dispositivos mecánicos simples</li>
+      <li>No depende de claves públicas o privadas modernas</li>
+      <li>Fácil de implementar, pero vulnerable a análisis estadístico</li>
+    </ul>
+
+    <h2 class="text-xl font-semibold mb-2">Ejemplos Populares:</h2>
+    <ul class="list-disc list-inside mb-4 space-y-1">
+      <li><strong>Cifrado César:</strong> Desplazamiento de letras en el alfabeto</li>
+      <li><strong>Atbash:</strong> Inversión total del alfabeto</li>
+      <li><strong>Vigenère:</strong> Uso de una palabra clave como patrón</li>
+      <li><strong>Máquina Enigma:</strong> Usada por los nazis en la Segunda Guerra Mundial</li>
+    </ul>
+
+    <p class="mb-4">
+      Estos sistemas permitieron mantener secretos militares y políticos durante siglos. Aunque son simples, muchos de ellos siguen enseñándose por su valor pedagógico.
+    </p>
+
+    <div class="text-center">
+      <button onclick="generatePDF()" class="bg-gray-800 text-white px-6 py-2 rounded">Guardar como PDF</button>
+    </div>
+  `;
+  break;
+
+          case 'moderna':
+  main.innerHTML = `
+    <h1 class="text-3xl font-bold mb-4">Criptografía Moderna</h1>
+    <p class="mb-4">
+      La criptografía moderna se basa en principios matemáticos como la teoría de números, álgebra abstracta y funciones hash. Permite asegurar comunicaciones, identidades y transacciones digitales.
+    </p>
+
+    <h2 class="text-xl font-semibold mb-2">Algoritmos Relevantes:</h2>
+    <ul class="list-disc list-inside mb-4 space-y-1">
+      <li><strong>AES (Advanced Encryption Standard):</strong> Cifrado simétrico rápido y robusto</li>
+      <li><strong>RSA:</strong> Cifrado asimétrico basado en la dificultad de factorizar números grandes</li>
+      <li><strong>SHA-256:</strong> Función hash usada ampliamente en blockchain</li>
+      <li><strong>ECC (Elliptic Curve Cryptography):</strong> Seguridad fuerte con claves más pequeñas</li>
+    </ul>
+
+    <h2 class="text-xl font-semibold mb-2">Aplicaciones Prácticas:</h2>
+    <ul class="list-disc list-inside mb-4 space-y-1">
+      <li>Protección de correos electrónicos (PGP)</li>
+      <li>Firmas digitales y certificados SSL</li>
+      <li>Blockchain y criptomonedas</li>
+      <li>Autenticación en dos pasos y tokens de acceso</li>
+    </ul>
+
+    <div class="text-center">
+      <button onclick="generatePDF()" class="bg-gray-800 text-white px-6 py-2 rounded">Generar PDF</button>
+    </div>
+  `;
+  break;
+
+         case 'tendencias':
+  main.innerHTML = `
+    <h1 class="text-3xl font-bold mb-4">Tendencias Criptográficas</h1>
+    <p class="mb-4">
+      La criptografía no deja de evolucionar. Nuevas amenazas, como la computación cuántica, exigen soluciones innovadoras. Aquí algunas de las tendencias más destacadas:
+    </p>
+
+    <ul class="list-disc list-inside mb-4 space-y-1">
+      <li><strong>Criptografía poscuántica:</strong> Algoritmos resistentes a la computación cuántica</li>
+      <li><strong>Zero-Knowledge Proofs (ZKP):</strong> Demostrar conocimiento sin revelar información</li>
+      <li><strong>Homomorphic Encryption:</strong> Procesar datos cifrados sin descifrarlos</li>
+      <li><strong>Blockchain y contratos inteligentes:</strong> Seguridad descentralizada</li>
+      <li><strong>Criptografía basada en identidad (IBE):</strong> Sustituye certificados digitales tradicionales</li>
+    </ul>
+
+    <p class="mb-4">
+      Estas innovaciones están redefiniendo cómo protegemos la privacidad y la integridad de la información en el mundo digital.
+    </p>
+
+    <div class="text-center">
+      <button onclick="generatePDF()" class="bg-gray-800 text-white px-6 py-2 rounded">Generar PDF</button>
+    </div>
+  `;
+  break;
+
+          case 'sobremi':
+  main.innerHTML = `
+        <div class="flex flex-col sm:flex-row items-center gap-6 mb-6">
+<img src="perfil.jpg" alt="Foto de Yoseph" class="w-32 h-32 rounded-md object-cover shadow-md border-2">
+      <div>
+        <p class="text-lg font-medium mb-2">Hola, soy Yoseph. Loco, raro, uno mas ... O menos si mi cabeza sigue asi xd.</p>
+        <ul class="list-disc list-inside text-gray-700">
+          <li>Estudiante de Ingeniería en Sistemas Computacionales en ESCOM</li>
+          <li>Escribo y aprendo por diversion y terapia</li>
+          <li>Adicto al sufrimiento y el autosabotaje</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold mb-2">Pasatiempos</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="text-center">
+          <img src="hobbit1.jpg" alt="Escribir" class="rounded-lg w-full h-40 object-cover mb-2">
+          <p><strong>Calistenia</strong></p>
+        </div>
+        <div class="text-center">
+          <img src="hobbitc.jpg" alt="Ajedrez" class="rounded-lg w-full h-40 object-cover mb-2">
+          <p><strong>Beber y aprender del Cáfe</strong></p>
+        </div>
+        <div class="text-center">
+          <img src="hobbit2.jpg" alt="Tecnología" class="rounded-lg w-full h-40 object-cover mb-2">
+          <p><strong>Destruirme: sufrimiento</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold mb-2">Contacto</h2>
+      <div class="flex justify-center gap-4 text-2xl text-purple-700">
+<a href="mailto:yoss.jmc.y@gmail.com"><i class="fas fa-envelope"></i></a>
+        <a href="https://github.com/YossJmc" target="_blank"><i class="fab fa-github"></i></a>
+        <a href="https://www.facebook.com/share/16ewPQSBXr/" target="_blank"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.instagram.com/yos_tkc?igsh=MWVlNzBiNWhqODh3bw==" target="_blank"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+      <a href="Curriculum_Yos.rar" download class="bg-gray-800 text-white px-6 py-2 rounded hover:bg-blue-800">Descargar CV</a>
+      
+      <a href="llave_publica.rar" download class="bg-gray-800 text-white px-6 py-2 rounded hover:bg-green-800">Descargar Llave Pública</a>
+    </div>
+  `;
+  break;
+
+          
+
+            case 'rsa':
+  main.innerHTML = `
+    <h1 class="text-3xl font-bold text-center mb-6">Practica RSA </h1>
+
+    <div class="flex flex-col items-center space-y-4">
+      
+
+      <div class="flex flex-col items-center space-y-4">
+  
+
+  <p id="estadoRSA" class="text-center text-green-700 text-sm font-semibold">
+    ✅ Llaves generadas correctamente.
+  </p>
+
+<div class="flex flex-col items-center justify-center w-full">
+
+    <!-- Sección de cifrado/descifrado -->
+<!-- Sección de cifrado/descifrado -->
+<div class="mt-10 w-full max-w-xl space-y-6">
+
+  <h2 class="text-xl font-bold">Alicia: Cifrar archivo</h2>
+
+  <label class="block text-sm text-gray-700">Archivo de texto a cifrar (.txt):</label>
+  <input type="file" id="archivoClaro" accept=".txt" class="w-full bg-white border border-gray-300 p-2 rounded" />
+
+  
+
+  <label class="block text-sm text-gray-700 mt-4">Clave pública de Betito (.json):</label>
+  <input type="file" id="llavePublicaArchivo" accept=".json" class="w-full bg-white border border-gray-300 p-2 rounded" />
+
+   
+
+  <button onclick="cifrarArchivoRSA()" class="bg-gray-800 hover:bg-blue-800 text-white px-6 py-2 rounded w-full">
+    Cifrar y descargar
+  </button>
+
+  <hr class="my-6">
+
+  <h2 class="text-xl text-center font-bold">Betito: Descifrar archivo cifrado</h2>
+
+  <label class="block text-sm text-gray-700">Selecciona el archivo cifrado (.txt):</label>
+  <input type="file" id="archivoCifrado" accept=".txt" class="w-full bg-white border border-gray-300 p-2 rounded" />
+
+  <label class="block text-sm text-gray-700">Selecciona la llave privada (.txt):</label>
+  <input type="file" id="clavePrivadaBetitoInput" accept=".json" class="w-full bg-white border border-gray-300 p-2 rounded" />
+
+
+  <button onclick="descifrarArchivoRSA()" class="bg-gray-800 hover:bg-green-800 text-white px-6 py-2 rounded w-full mt-2">
+    Descifrar
+  </button>
+
+  <p id="resultadoDescifrado" class="text-sm text-gray-800 whitespace-pre-wrap mt-4"></p>
+
+  <hr class="my-10">
+
+<div class="bg-yellow-100 border border-yellow-400 text-yellow-800 p-6 rounded-lg w-full max-w-xl text-center mx-auto shadow-md">
+  <h2 class="text-2xl font-bold mb-4">Candy</h2>
+
+  <label class="block text-sm mb-1 text-left">Mensaje (.txt):</label>
+  <input type="file" id="archivoFalsoCandy" accept=".txt" class="w-full p-2 border border-gray-300 rounded mb-4">
+
+  <label class="block text-sm mb-1 text-left">Clave pública de Betito (.json):</label>
+  <input type="file" id="llavePublicaCandy" accept=".json" class="w-full p-2 border border-gray-300 rounded mb-4">
+
+  <button onclick="fabricarMensajeCandy()" class="bg-gray-800 hover:bg-red-700 text-white px-6 py-2 rounded">
+    Fabricar mensaje falso
+  </button>
+
+  <p id="salidaCandyFabricado" class="text-left text-sm font-mono mt-4 whitespace-pre-wrap"></p>
+</div>
+
+
+
+</div>
+</div>
+
+  `;
+  break;
+
+  case 'rsa_hibrido':
+          
+            main.innerHTML = `
+              <!-- Sección Híbrido RSA-AES para tu app -->
+<div class="flex flex-col items-center justify-center w-full space-y-6 mt-8">
+
+  <h1 class="text-3xl font-bold text-center">Cifrado Híbrido (AES + RSA)</h1>
+  
+
+  <!-- INPUT DE ARCHIVO ORIGINAL -->
+  <div class="w-full max-w-xl">
+    <label class="block mb-1 text-sm font-semibold">Selecciona un archivo original (.txt):</label>
+    <input type="file" id="archivoOriginal" accept=".txt" class="w-full p-2 border border-gray-300 rounded" />
+  </div>
+
+  <!-- CLAVE PUBLICA DEL RECEPTOR -->
+  <div class="w-full max-w-xl">
+    <label class="block mb-1 text-sm font-semibold">Clave pública del receptor (Betito - .json):</label>
+    <input type="file" id="clavePublicaReceptor" accept=".json" class="w-full p-2 border border-gray-300 rounded" />
+  </div>
+
+  <!-- BOTON DE FIRMAR Y CIFRAR -->
+  <button onclick="hibridoFirmarYCifrar()" class="bg-purple-700 hover:bg-purple-800 text-white px-6 py-2 rounded">
+    Firmar y Cifrar
+  </button>
+
+  <!-- RESULTADO -->
+  <p id="resultadoHibrido" class="text-center text-sm text-green-700 font-mono"></p>
+</div>
+<hr class="my-10 border-gray-400">
+
+<h2 class="text-2xl font-bold text-center mb-4">Betito - Validar y Descifrar</h2>
+<div class="w-full max-w-xl mx-auto space-y-4">
+
+  <label class="block text-sm text-gray-700">Archivo cifrado con AES:</label>
+  <input type="file" id="archivoCifradoAES" accept=".bin" class="w-full p-2 border border-gray-300 rounded" />
+
+  <label class="block text-sm text-gray-700">Clave AES cifrada (RSA):</label>
+  <input type="file" id="claveAESCifrada" accept=".bin" class="w-full p-2 border border-gray-300 rounded" />
+
+  <label class="block text-sm text-gray-700">Firma digital (RSA):</label>
+  <input type="file" id="firmaDigitalArchivo" accept=".bin" class="w-full p-2 border border-gray-300 rounded" />
+
+  <label class="block text-sm text-gray-700">Vector Inicial AES:</label>
+  <input type="file" id="vectorInicialAES" accept=".bin" class="w-full p-2 border border-gray-300 rounded" />
+
+  <button onclick="procesarMensajeHibrido()" class="bg-gray-800 hover:bg-green-800 text-white px-6 py-2 rounded w-full">
+    Procesar y verificar mensaje
+  </button>
+
+  <pre id="salidaHibrido" class="text-sm text-left bg-white border border-gray-300 rounded p-4 whitespace-pre-wrap"></pre>
+</div>
+
+            `;
+            break;
+
+        }
+      }
+
+
+let clavePrivadaBetito = null;
+let clavePublicaBetito = null;
+let clavePrivadaAlicia = null;
+let clavePublicaAlicia = null;
+
+
+// Solo clave pública se incluye en el sitio, la privada la guardas tú
+fetch('llaves/betito_llave_publica.json')
+  .then(res => res.json())
+  .then(async jwk => {
+    clavePublicaBetito = await crypto.subtle.importKey(
+      "jwk",
+      jwk,
+      { name: "RSA-OAEP", hash: "SHA-256" },
+      false,
+      ["encrypt"]
+    );
+    console.log("✅ Clave pública de Betito cargada.");
+  });
+
+
+
+async function cifrarArchivoRSA() {
+  const inputTexto = document.getElementById("archivoClaro");
+  const inputLlave = document.getElementById("llavePublicaArchivo");
+
+  if (!inputTexto.files.length || !inputLlave.files.length) {
+    alert("🚫 Debes seleccionar un archivo de texto y una clave pública (.json).");
+    return;
+  }
+
+  // Leer archivo de texto
+  const textoPlano = await inputTexto.files[0].text();
+
+  // Leer y parsear clave pública en formato JWK
+  const jwkJson = await inputLlave.files[0].text();
+  let jwk;
+  try {
+    jwk = JSON.parse(jwkJson);
+  } catch (err) {
+    alert("⚠️ La clave pública no es un JSON válido.");
+    return;
+  }
+
+  const clavePublicaImportada = await crypto.subtle.importKey(
+    "jwk",
+    jwk,
+    {
+      name: "RSA-OAEP",
+      hash: "SHA-256"
+    },
+    false,
+    ["encrypt"]
+  );
+
+  const encoder = new TextEncoder();
+  const datos = encoder.encode(textoPlano);
+
+  const cifrado = await crypto.subtle.encrypt(
+    {
+      name: "RSA-OAEP"
+    },
+    clavePublicaImportada,
+    datos
+  );
+
+  // Convertir a base64 para guardarlo como texto
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(cifrado)));
+
+  const blob = new Blob([base64], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "archivo_cifrado.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function descifrarArchivoRSA() {
+  const archivo = document.getElementById("archivoDescifradoRSA").files[0];
+  if (!archivo) {
+    document.getElementById("resultadoDescifrado").textContent = "⚠️ No has subido ningún archivo cifrado.";
+    return;
+  }
+
+  if (!clavePrivadaBetito) {
+    document.getElementById("resultadoDescifrado").textContent = "⚠️ Aún no has cargado tu clave privada.";
+    return;
+  }
+document.getElementById("clavePrivadaBetitoInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    const jwk = JSON.parse(text);
+
+    clavePrivadaBetito = await crypto.subtle.importKey(
+      "jwk",
+      jwk,
+      {
+        name: "RSA-OAEP",
+        hash: "SHA-256"
+      },
+      false,
+      ["decrypt"]
+    );
+
+    console.log("🔐 Clave privada cargada correctamente.");
+    document.getElementById("resultadoDescifrado").textContent = "🔐 Clave privada cargada correctamente.";
+  } catch (e) {
+    console.error("❌ Error al importar la clave:", e);
+    document.getElementById("resultadoDescifrado").textContent = "❌ Error al cargar la clave privada. Asegúrate de que sea un archivo JSON válido.";
+  }
+});
+
+  const contenido = await archivo.text();
+  const datos = JSON.parse(contenido);
+  const textoCifrado = Uint8Array.from(datos.textoCifrado);
+
+  try {
+    const descifrado = await crypto.subtle.decrypt(
+      {
+        name: "RSA-OAEP",
+      },
+      clavePrivadaBetito,
+      textoCifrado
+    );
+
+    const decodificado = new TextDecoder().decode(descifrado);
+    document.getElementById("resultadoDescifrado").textContent = "🟢 Mensaje descifrado: " + decodificado;
+  } catch (e) {
+    console.error("❌ Error al descifrar:", e);
+    document.getElementById("resultadoDescifrado").textContent = "❌ Error al descifrar el mensaje.";
+  }
+}
+
+
+let clavePrivadaCandy = null;
+let clavePublicaCandy = null;
+
+async function fabricarMensajeCandy() {
+  const archivo = document.getElementById("archivoFalsoCandy");
+  const clave = document.getElementById("llavePublicaCandy");
+  const salida = document.getElementById("salidaCandyFabricado");
+
+  if (!archivo.files.length || !clave.files.length) {
+    salida.textContent = "⚠️ Debes seleccionar un archivo falso y la clave pública de Betito.";
+    return;
+  }
+
+  const mensaje = await archivo.files[0].text();
+  const jwkJson = await clave.files[0].text();
+
+  let jwk;
+  try {
+    jwk = JSON.parse(jwkJson);
+  } catch (err) {
+    salida.textContent = "❌ La clave pública no es un JSON válido.";
+    return;
+  }
+
+  try {
+    const clavePublicaImportada = await crypto.subtle.importKey(
+      "jwk",
+      jwk,
+      {
+        name: "RSA-OAEP",
+        hash: "SHA-256"
+      },
+      false,
+      ["encrypt"]
+    );
+
+    const datos = new TextEncoder().encode(mensaje);
+    const cifrado = await crypto.subtle.encrypt(
+      { name: "RSA-OAEP" },
+      clavePublicaImportada,
+      datos
+    );
+
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(cifrado)));
+
+    // Crear y descargar archivo
+    const blob = new Blob([base64], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "mensaje_falso_candy.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+
+    salida.textContent = "🎯 Mensaje falso cifrado y descargado exitosamente.";
+  } catch (err) {
+    salida.textContent = "❌ No se pudo cifrar el mensaje falso.";
+  }
+}
+
+
+async function mensajeFalsoDeCandy() {
+  const salida = document.getElementById("salidaCandyFalsa");
+
+  if (!clavePublicaBetito || !clavePrivadaBetito) {
+    salida.textContent = "⚠️ Necesitas generar primero tus llaves RSA.";
+    return;
+  }
+
+  // Candy escribe un mensaje falso
+  const mensajeFalso = `El examen fue cancelado, ya no es necesario entregar nada.\natte.\nAlicia`;
+
+  const encoder = new TextEncoder();
+  const datos = encoder.encode(mensajeFalso);
+
+  // Candy cifra el mensaje con la clave pública de Betito
+  const cifrado = await crypto.subtle.encrypt(
+    { name: "RSA-OAEP" },
+    clavePublicaBetito,
+    datos
+  );
+
+  // Betito (tú) lo recibe y lo descifra
+  try {
+    const descifrado = await crypto.subtle.decrypt(
+      { name: "RSA-OAEP" },
+      clavePrivadaBetito,
+      cifrado
+    );
+
+    const mensaje = new TextDecoder().decode(descifrado);
+
+    salida.textContent = `📩 Mensaje recibido:\n\n${mensaje}\n\n🧠 Pero... ¿realmente lo mandó Alicia?\n❗ No hay forma de verificarlo sin una firma digital. Este mensaje fue falsificado por Candy.`;
+  } catch (e) {
+    salida.textContent = "❌ No se pudo descifrar el mensaje falso.";
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function hibridoFirmarYCifrar() {
+  const archivoInput = document.getElementById("archivoOriginal");
+  const claveInput = document.getElementById("clavePublicaReceptor");
+  const salida = document.getElementById("resultadoHibrido");
+
+  if (!archivoInput.files.length || !claveInput.files.length) {
+    salida.textContent = "⚠️ Faltan archivos: selecciona el original y la clave pública del receptor.";
+    return;
+  }
+
+  const archivoTexto = await archivoInput.files[0].text();
+  const jwkPublicaJSON = await claveInput.files[0].text();
+
+  let clavePublica;
+  try {
+    clavePublica = await crypto.subtle.importKey(
+      "jwk", JSON.parse(jwkPublicaJSON),
+      { name: "RSA-OAEP", hash: "SHA-256" },
+      false, ["encrypt"]
+    );
+  } catch {
+    salida.textContent = "❌ Error: Clave pública inválida.";
+    return;
+  }
+
+  // 1. Generar clave AES aleatoria
+  const claveAES = crypto.getRandomValues(new Uint8Array(32));
+  const iv = crypto.getRandomValues(new Uint8Array(12)); // para AES-GCM
+
+  // 2. Cifrar archivo original con AES-GCM
+  const cifradoAES = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    await crypto.subtle.importKey("raw", claveAES, "AES-GCM", false, ["encrypt"]),
+    new TextEncoder().encode(archivoTexto)
+  );
+
+  // 3. Calcular hash SHA-256
+  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(archivoTexto));
+
+  // 4. Firmar hash con clave privada de ALICIA (simulada)
+  if (!clavePrivadaAlicia) {
+    salida.textContent = "🔐 Falta clave privada de Alicia para firmar.";
+    return;
+  }
+  const firma = await crypto.subtle.sign(
+    { name: "RSA-PSS", saltLength: 32 },
+    clavePrivadaAlicia,
+    hash
+  );
+
+  // 5. Cifrar clave AES con clave pública del receptor
+  const claveAEScifrada = await crypto.subtle.encrypt(
+    { name: "RSA-OAEP" },
+    clavePublica,
+    claveAES
+  );
+
+  // 6. Descargar archivos
+  const descargar = (data, nombre) => {
+    const blob = new Blob([data], { type: "application/octet-stream" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = nombre;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  descargar(new Uint8Array(cifradoAES), "documento_cifrado_aes.bin");
+  descargar(claveAEScifrada, "clave_aes_cifrada_rsa.bin");
+  descargar(firma, "firma_digital.bin");
+  descargar(iv, "vector_inicial_aes.bin");
+
+  salida.textContent = "✅ Todo cifrado y firmado. Archivos descargados correctamente.";
+}
+
+
+
+
+
+
+
+
+
+async function procesarMensajeHibrido() {
+  const salida = document.getElementById("salidaHibrido");
+  salida.textContent = "Procesando...";
+
+  const archivoAES = document.getElementById("archivoCifradoAES").files[0];
+  const archivoClave = document.getElementById("claveAESCifrada").files[0];
+  const archivoFirma = document.getElementById("firmaDigitalArchivo").files[0];
+  const archivoIV = document.getElementById("vectorInicialAES").files[0];
+
+  if (!archivoAES || !archivoClave || !archivoFirma || !archivoIV) {
+    salida.textContent = "❌ Faltan uno o más archivos.";
+    return;
+  }
+
+  if (!clavePrivadaBetito || !clavePublicaAlicia) {
+    salida.textContent = "❗ Debes tener tus claves RSA generadas y la clave pública de Alicia cargada.";
+    return;
+  }
+
+  try {
+    // Leer archivos binarios
+    const [aesData, claveCifrada, firma, iv] = await Promise.all([
+      archivoAES.arrayBuffer(),
+      archivoClave.arrayBuffer(),
+      archivoFirma.arrayBuffer(),
+      archivoIV.arrayBuffer()
+    ]);
+
+    // 1. Betito descifra la clave AES con su clave privada
+    const claveAES = await crypto.subtle.decrypt(
+      { name: "RSA-OAEP" },
+      clavePrivadaBetito,
+      claveCifrada
+    );
+
+    // 2. Descifra el mensaje con AES
+    const mensajeClaro = await crypto.subtle.decrypt(
+      {
+        name: "AES-CBC",
+        iv: new Uint8Array(iv)
+      },
+      await crypto.subtle.importKey("raw", claveAES, "AES-CBC", false, ["decrypt"]),
+      aesData
+    );
+
+    const mensaje = new TextDecoder().decode(mensajeClaro);
+
+    // 3. Genera el hash y verifica firma
+    const hash = await crypto.subtle.digest("SHA-256", mensajeClaro);
+    const firmaOk = await crypto.subtle.verify(
+      { name: "RSA-PSS", saltLength: 32 },
+      clavePublicaAlicia,
+      firma,
+      hash
+    );
+
+    // 4. Mostrar resultado
+    salida.textContent = `✅ Mensaje descifrado:\n\n${mensaje}\n\n🔏 Firma válida: ${firmaOk ? "Sí, autenticado ✅" : "No, posible alteración ❌"}`;
+  } catch (e) {
+    salida.textContent = "❌ Error al procesar el mensaje. Puede que las claves no coincidan o los archivos estén dañados.";
+  }
+}
+
+
+
+
+
+
+
+      // Cargar sección predeterminada
+      loadContent('clasica');
+    </script>
+    <script>import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+const auth = getAuth();
+const db = getFirestore();
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const ref = doc(db, "usuarios", user.uid);
+    const docSnap = await getDoc(ref);
+
+    const name = docSnap.exists() ? docSnap.data().nombre : user.email;
+    const titulo = document.getElementById("bienvenidaUsuario");
+    if (titulo) titulo.textContent = `👋 Bienvenido: ${name}`;
+  }
+});
+
+
+
+
+
+</script>
+  </body>
+  </html>

@@ -1,0 +1,29 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Crypto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center mb-4">Iniciar Sesión</h2>
+    <input id="email" type="email" placeholder="Correo electrónico" class="w-full mb-3 p-2 border rounded" />
+    <input id="password" type="password" placeholder="Contraseña segura" class="w-full mb-3 p-2 border rounded" />
+
+    <button onclick="login()" class="w-full bg-purple-600 text-white p-2 rounded mb-2 hover:bg-purple-700 transition">Iniciar sesión</button>
+
+    <div class="text-center text-sm mt-3">
+      <a href="recover.html" class="text-blue-600 hover:underline block mb-2">¿Olvidaste tu contraseña?</a>
+      <span>¿No tienes cuenta? <a href="register.html" class="text-blue-600 hover:underline">Crear una cuenta</a></span>
+    </div>
+
+    <p id="message" class="mt-4 text-center text-sm text-red-600"></p>
+  </div>
+
+  <!-- Firebase y lógica -->
+  <script type="module" src="main.js"></script>
+</body>
+</html>
