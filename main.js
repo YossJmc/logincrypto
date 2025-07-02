@@ -21,7 +21,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAK1EFhR-hCukQtaIp51atV2lzBeNx-ITo",
   authDomain: "cryptoyos-a0e66.firebaseapp.com",
   projectId: "cryptoyos-a0e66",
-  storageBucket: "cryptoyos-a0e66.appspot.com", // <-- esto estaba mal
+  storageBucket: "cryptoyos-a0e66.appspot.com", 
   messagingSenderId: "910899320304",
   appId: "1:910899320304:web:4fb01fa68829be9d9eb935"
 };
